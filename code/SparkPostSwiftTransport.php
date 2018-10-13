@@ -361,6 +361,23 @@ class SparkPostSwiftTransport implements Swift_Transport
             $recipients[] = $recipient;
         }
 
+        foreach ($bccAddresses as $bccEmail => $bccName) {
+            $bccRecipient = array(
+                'address' => array(
+                    'email' => $bccEmail,
+                    'header_to' => $primaryEmail ? $primaryEmail : $bccEmail,
+                )
+            );
+             $bccRecipients[] = $bccRecipient;
+        }
+
+        // Add Bcc's to recipients
+        if (!empty($bccRecipients)) {
+            foreach ($bccRecipients as $email) {
+                $recipients[] = $email;
+            }
+        }
+
         $reply_to = null;
         foreach ($replyToAddresses as $replyToEmail => $replyToName) {
             if ($replyToName) {
@@ -375,14 +392,6 @@ class SparkPostSwiftTransport implements Swift_Transport
             $cc[] = array(
                 'email' => $ccEmail,
                 'name' => $ccName,
-                'header_to' => $primaryEmail ? $primaryEmail : $ccEmail,
-            );
-        }
-
-        foreach ($bccAddresses as $bccEmail => $bccName) {
-            $bcc[] = array(
-                'email' => $bccEmail,
-                'name' => $bccName,
                 'header_to' => $primaryEmail ? $primaryEmail : $ccEmail,
             );
         }
