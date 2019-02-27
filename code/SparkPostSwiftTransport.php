@@ -468,14 +468,18 @@ class SparkPostSwiftTransport implements Swift_Transport
                     'name' => $fromFirstName,
                     'email' => $fromFirstEmail,
                 ),
-                'headers' => [
-                    'CC' => $cc[0]["address"]['email']
-                ],
                 'subject' => $message->getSubject(),
                 'html' => $bodyHtml,
                 'text' => $bodyText,
             ),
         );
+
+        if (isset($cc[0]["address"]['email'])) {
+            $sparkPostMessage['content']['headers'] = [
+                'CC' => $cc[0]["address"]['email']
+            ];
+        }
+
         if ($reply_to) {
             $sparkPostMessage['reply_to'] = $reply_to;
         }
