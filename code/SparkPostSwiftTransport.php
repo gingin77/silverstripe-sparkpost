@@ -361,6 +361,17 @@ class SparkPostSwiftTransport implements Swift_Transport
             $recipients[] = $recipient;
         }
 
+        // @link https://www.sparkpost.com/docs/faq/cc-bcc-with-rest-api/
+        foreach ($ccAddresses as $ccEmail => $ccName) {
+            $cc[] = array(
+                'address' => [
+                    'email' => $ccEmail,
+                    'name' => $ccName,
+                    'header_to' => $primaryEmail ? $primaryEmail : $ccEmail,
+                ]
+            );
+        }
+
         foreach ($bccAddresses as $bccEmail => $bccName) {
             $bccRecipient = array(
                 'address' => array(
@@ -369,6 +380,13 @@ class SparkPostSwiftTransport implements Swift_Transport
                 )
             );
              $bccRecipients[] = $bccRecipient;
+        }
+
+        // Add CC's to recipients
+        if (!empty($cc)) {
+            foreach ($cc as $email) {
+                $recipients[] = $email;
+            }
         }
 
         // Add Bcc's to recipients
@@ -450,6 +468,9 @@ class SparkPostSwiftTransport implements Swift_Transport
                     'name' => $fromFirstName,
                     'email' => $fromFirstEmail,
                 ),
+                'headers' => [
+                    'CC' => $cc[0]["address"]['email']
+                ],
                 'subject' => $message->getSubject(),
                 'html' => $bodyHtml,
                 'text' => $bodyText,
@@ -466,9 +487,6 @@ class SparkPostSwiftTransport implements Swift_Transport
         }
 
         // Add remaining elements
-        if (!empty($cc)) {
-            $sparkPostMessage['headers.CC'] = $cc;
-        }
         if (!empty($headers)) {
             $sparkPostMessage['customHeaders'] = $headers;
         }
