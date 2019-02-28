@@ -366,7 +366,7 @@ class SparkPostSwiftTransport implements Swift_Transport
             $cc[] = array(
                 'address' => [
                     'email' => $ccEmail,
-                    'name' => $ccName,
+                    'name' => $toAddresses[$primaryEmail],
                     'header_to' => $primaryEmail ? $primaryEmail : $ccEmail,
                 ]
             );
@@ -403,15 +403,6 @@ class SparkPostSwiftTransport implements Swift_Transport
             } else {
                 $reply_to = $replyToEmail;
             }
-        }
-
-        // @link https://www.sparkpost.com/docs/faq/cc-bcc-with-rest-api/
-        foreach ($ccAddresses as $ccEmail => $ccName) {
-            $cc[] = array(
-                'email' => $ccEmail,
-                'name' => $ccName,
-                'header_to' => $primaryEmail ? $primaryEmail : $ccEmail,
-            );
         }
 
         $bodyHtml = $bodyText = null;
