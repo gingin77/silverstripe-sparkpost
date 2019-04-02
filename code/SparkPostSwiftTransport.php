@@ -338,6 +338,15 @@ class SparkPostSwiftTransport implements Swift_Transport
         // Build recipients list
         // @link https://developers.sparkpost.com/api/recipient-lists.html
         $primaryEmail = null;
+
+        $headerTo = [];
+        if (sizeof($toAddresses) > 1 && sizeof($ccAddresses) == 0 && sizeof($bccAddresses) == 0) {
+            foreach ($toAddresses as $toEmail => $toName) {
+                $headerTo[] = " ".$toName." <".$toEmail.">";
+            }
+        }
+        $headerToString = ltrim(implode(",",$headerTo));
+
         foreach ($toAddresses as $toEmail => $toName) {
             if ($primaryEmail === null) {
                 $primaryEmail = $toEmail;
@@ -345,12 +354,22 @@ class SparkPostSwiftTransport implements Swift_Transport
             if (!$toName) {
                 $toName = $toEmail;
             }
-            $recipient = array(
-                'address' => array(
-                    'email' => $toEmail,
-                    'name' => $toName,
-                )
-            );
+            if (sizeof($toAddresses) > 1 && sizeof($ccAddresses) == 0 && sizeof($bccAddresses) == 0) {
+                $recipient = array(
+                    'address' => array(
+                        'email'     => $toEmail,
+                        'header_to' => $headerToString
+                    )
+                );
+            } else {
+                $recipient = array(
+                    'address' => array(
+                        'email' => $toEmail,
+                        'name'  => $toName,
+                    )
+                );
+            }
+
             if (!empty($tags)) {
                 $recipient['tags'] = $tags;
             }
