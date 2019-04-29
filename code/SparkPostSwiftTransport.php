@@ -484,9 +484,16 @@ class SparkPostSwiftTransport implements Swift_Transport
             ),
         );
 
+        $myHeaderArray = [];
         if (isset($cc[0]["address"]['email'])) {
+            foreach ($cc as $ccItem) {
+                $myHeaderArray[] = $ccItem["address"]['email'];
+            }
+        }
+
+        if (sizeof($myHeaderArray) > 0) {
             $sparkPostMessage['content']['headers'] = [
-                'CC' => $cc[0]["address"]['email']
+                'CC' => implode(",",$myHeaderArray)
             ];
         }
 
